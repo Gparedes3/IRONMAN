@@ -1,43 +1,43 @@
-"""Parte B — Experimento de KV cache.
+"""
+parte_b_kvcache.py  —  PARTE B del trabajo
+===========================================
+Estudia el KV CACHE: la "memoria temporal" donde el modelo guarda lo que ya
+leyó para no recalcularlo. Cuanto más largo es el texto (contexto), más grande
+es ese caché y más RAM consume.
 
-Mide tokens/s (prefill y generación) y RAM pico con prompts que llenan
-contextos de 512, 2048, 8192 y 16384 tokens, usando el mejor modelo de la
-Parte A. El tamaño teórico del KV cache crece linealmente con el contexto:
+Mide velocidad (prefill y generación) y RAM pico con contextos de 512, 2048,
+8192 y 16384 tokens, usando el modelo elegido en la Parte A (Q4_K_M).
 
-    KV bytes = 2 (K y V) * n_layers * n_kv_heads * head_dim * ctx * bytes/elem
+Teoría que vamos a comprobar (crecimiento LINEAL con el contexto):
+    bytes KV = 2(K y V) * n_capas * n_kv_heads * head_dim * contexto * bytes
+Para llama3.2 3B (28 capas, 8 KV-heads, head_dim 128, f16 = 2 bytes):
+    2 * 28 * 8 * 128 * contexto * 2 = 112 KB por token  ->  ~1.75 GB a 16K.
 
-Para llama3.2 3B (28 capas, 8 KV heads, head_dim 128, f16):
-    2 * 28 * 8 * 128 * ctx * 2 bytes = 112 KB/token  →  ~1.75 GB a 16K.
-
-Uso:
-  python benchmarks/bench_kv.py                 # KV cache f16 (por defecto)
-  python benchmarks/bench_kv.py --kv q8_0       # etiqueta filas como q8_0
-                                                # (el servidor debe arrancarse
-                                                #  con run_kv_quant.ps1)
+Cómo se ejecuta:
+  python parte_b_kvcache.py              # KV cache normal (f16)
+  python parte_b_kvcache.py --kv q8_0    # etiqueta las filas como q8_0
+                                         # (el servidor debe arrancarse con KV
+                                         #  cuantizado; ver run_kv_quant.ps1)
 """
 import argparse
 import csv
-import sys
 from pathlib import Path
 
 import ollama
 
-sys.path.insert(0, str(Path(__file__).parent))
-from common import OLLAMA_HOST, stop_model, timed_generate
+from medir_comun import OLLAMA_HOST, stop_model, timed_generate
 
-MODEL = "llama3.2:3b-instruct-q4_K_M"   # mejor equilibrio según Parte A
-CONTEXTS = [512, 2048, 8192, 16384]
+MODEL = "llama3.2:3b-instruct-q4_K_M"   # el mejor equilibrio según la Parte A
+CONTEXTS = [512, 2048, 8192, 16384]     # las 4 longitudes de contexto a probar
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent
 CSV_PATH = ROOT / "measurements.csv"
 CSV_FIELDS = ["model", "quantization", "context_length", "file_size_mb",
               "peak_ram_mb", "prompt_eval_tps", "eval_tps", "wall_s",
               "prompt_tokens", "gen_tokens", "kv_cache_type", "quality_avg",
               "notes"]
 
-# Párrafo neutro (~95 palabras ≈ 125 tokens) que se repite hasta llenar
-# el contexto objetivo. El recuento real de tokens lo devuelve Ollama
-# (prompt_eval_count) y se guarda en el CSV.
+# Párrafo neutro (~125 tokens) que se repite hasta llenar el contexto deseado.
 FILLER = (
     "The history of mechanical refrigeration began in the eighteenth century "
     "when early experimenters observed that evaporating volatile liquids "
@@ -50,16 +50,15 @@ FILLER = (
     "compressors and improved insulation, reducing energy consumption while "
     "increasing reliability and capacity for ordinary families everywhere. "
 )
-TOKENS_PER_FILLER = 125  # aproximado; el valor real se mide y se registra
+TOKENS_PER_FILLER = 125  # aproximado; el valor REAL lo mide Ollama y se guarda
 
 
 def build_prompt(target_ctx: int) -> str:
-    """Prompt que ocupa ~(target_ctx - 250) tokens, dejando sitio para
-    la plantilla de chat y los 200 tokens de generación."""
+    """Construye un prompt que ocupe casi todo el contexto objetivo,
+    dejando hueco para la plantilla de chat y los 200 tokens de respuesta."""
     target_tokens = max(target_ctx - 250, 100)
     reps = max(target_tokens // TOKENS_PER_FILLER, 1)
-    return (FILLER * reps
-            + "\n\nSummarize the text above in one short paragraph.")
+    return FILLER * reps + "\n\nSummarize the text above in one short paragraph."
 
 
 def append_row(row: dict):
@@ -80,11 +79,10 @@ def main():
 
     client = ollama.Client(host=OLLAMA_HOST)
     for ctx in args.contexts:
-        print(f"\n=== ctx={ctx} (KV {args.kv}) ===")
-        stop_model(MODEL)  # recargar para que num_ctx y RAM partan de cero
+        print(f"\n=== contexto={ctx} (KV {args.kv}) ===")
+        stop_model(MODEL)  # recargar para que num_ctx y la RAM partan de cero
         prompt = build_prompt(ctx)
-        r = timed_generate(client, MODEL, prompt,
-                           num_predict=200, num_ctx=ctx)
+        r = timed_generate(client, MODEL, prompt, num_predict=200, num_ctx=ctx)
         print(f"  prompt real: {r['prompt_tokens']} tokens | "
               f"prefill {r['prompt_eval_tps']} tok/s | "
               f"gen {r['eval_tps']} tok/s | "

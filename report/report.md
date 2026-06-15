@@ -1,13 +1,10 @@
 ---
 title: "IRONMAN: un Jarvis local en CPU — cuantización, KV cache, RAG y herramientas MCP"
-author: "Guillermo Uide — Applied Machine Learning: Local LLM Systems"
+author: "Guillermo Paredes — Applied Machine Learning: Local LLM Systems"
 date: "Junio 2026"
 geometry: margin=2.2cm
 fontsize: 10pt
 ---
-
-<!-- Convertir a PDF:  pandoc report/report.md -o report/report.pdf
-     (o imprimir desde VS Code con la extensión Markdown PDF) -->
 
 # 1. Abstract
 
@@ -40,10 +37,9 @@ sale a la nube.*
 La interfaz del núcleo es de texto (`jarvis.py`), la misma que usa la
 evaluación automática de la Parte E. Todas las llamadas de inferencia fijan
 `num_gpu: 0`: el equipo tiene una RTX 4060 que se deshabilita explícitamente
-para cumplir la restricción de hardware del enunciado. (Una interfaz de voz
-opcional —Whisper + TTS— se conserva en `bonus/` como material extra.)
+para cumplir la restricción de hardware del enunciado.
 
-El servidor MCP propio (`mcp_server/server.py`) expone seis herramientas por
+El servidor MCP propio (`mcp_server.py`) expone seis herramientas por
 stdio: `fetch_recent_emails` y `send_email` (Gmail IMAP/SMTP), `open_app`,
 `open_website` y `web_search` (control del PC y búsqueda), y `search_docs`
 (puente al RAG sobre top-4 de 1134 chunks del corpus de docs de Ollama
@@ -51,9 +47,9 @@ y llama.cpp, ~202 págs).
 
 ![Pipeline RAG](../docs/img/flujo_rag.png)
 
-*Figura 2. Pipeline RAG. El indexado (offline, `ingest.py`) trocea el corpus,
+*Figura 2. Pipeline RAG. El indexado (offline, `parte_c_rag.py ingest`) trocea el corpus,
 lo incrusta con nomic-embed-text y lo guarda en sqlite-vec. En consulta
-(online, `rag.py`) la pregunta se incrusta con el mismo modelo, se recuperan
+(online, `parte_c_rag.py`) la pregunta se incrusta con el mismo modelo, se recuperan
 los top-K fragmentos por similitud coseno y se inyectan en el prompt.*
 
 ![Llamada a herramienta vía MCP](../docs/img/flujo_mcp.png)
@@ -80,7 +76,7 @@ RAM pico: muestreo cada 200 ms del working-set de todos los procesos
 `ollama*` durante la inferencia (psutil). Velocidad: completación fija de
 200 tokens, media de 3 repeticiones. Calidad: 5 prompts estandarizados
 (matemáticas, código, resumen, memoria factual, razonamiento) puntuados 0–3
-con la rúbrica escrita de `benchmarks/RUBRIC.md`; el prompt de código se
+con la rúbrica escrita de `rubrica.md`; el prompt de código se
 valida además ejecutándolo sobre 5 casos de prueba.
 
 **Corpus RAG.** Documentación oficial de Ollama (repo GitHub + web
@@ -95,7 +91,7 @@ párrafos con solape de 150; almacenamiento en sqlite-vec.
 **Test set.** 21 prompts en 5 categorías (chat puro, RAG, herramienta,
 multi-paso, adversarial), cada uno con un tipo de resultado esperado
 declarado (tools requeridas/prohibidas, palabras clave). Runner automático
-(`evaluation/run_tests.py`) con veredicto success/partial/fail, latencia y
+(`parte_e_evaluacion.py`) con veredicto success/partial/fail, latencia y
 tokens por test. Las herramientas con efectos secundarios se ejecutan en
 seco para poder repetir la evaluación sin enviar correos reales.
 
@@ -191,7 +187,7 @@ Dos tareas end-to-end que requieren herramientas: (1) *"Resume mis últimos 5
 correos"* → `fetch_recent_emails` → resumen hablado; (2) *"Look up in the
 local docs which environment variable moves the Ollama model directory, then
 email the answer to test@example.com"* → `search_docs` + `send_email`
-encadenadas. Fallos documentados con evidencia en `mcp_server/FAILURES.md`;
+encadenadas. Fallos documentados con evidencia en `FAILURES.md`;
 resumen: funcionan de forma fiable los imperativos directos con la acción
 explícita (`open_app` "abre la calculadora", `web_search` "busca en internet…",
 `fetch_recent_emails` "resume mis últimos 5 correos", `search_docs` "busca en
@@ -278,19 +274,18 @@ medida en la Parte B.
 ```powershell
 git clone <REPO_URL> && cd IRONMAN
 .\setup.ps1                              # venv + deps fijadas + modelos + índice RAG
-python benchmarks\bench_quant.py         # Parte A  → measurements.csv
-python benchmarks\bench_kv.py            # Parte B (KV f16)
-.\benchmarks\run_kv_quant.ps1            # Parte B.4 (KV q8_0)
-python benchmarks\plots.py               # gráficas
-python rag\compare_rag.py                # Parte C
-python evaluation\run_tests.py           # Parte E
+python parte_a_cuantizacion.py           # Parte A  -> measurements.csv
+python parte_b_kvcache.py                # Parte B (KV f16)
+.\run_kv_quant.ps1                       # Parte B.4 (KV q8_0)
+python graficas.py                       # gráficas
+python parte_c_rag.py compare            # Parte C
+python parte_e_evaluacion.py             # Parte E
 python jarvis.py                         # demo interactiva (texto)
-python main.py                           # demo por voz (bonus)
 ```
 
 Versiones: Ollama 0.30.6, Python 3.13, paquetes fijados en `requirements.txt`
-(ollama 0.6.2, mcp 1.27.2, sqlite-vec 0.1.9, psutil 7.2.2, faster-whisper 1.2.1).
-Semillas: `temperature=0, seed=42` en todos los experimentos.
+(ollama 0.6.2, mcp 1.27.2, sqlite-vec 0.1.9, psutil 7.2.2). Semillas:
+`temperature=0, seed=42` en todos los experimentos.
 
 # 7. Referencias
 
@@ -305,12 +300,11 @@ Semillas: `temperature=0, seed=42` en todos los experimentos.
 
 # AI Use Statement
 
-Este proyecto usó **Claude (Claude Code, modelo Fable 5, Anthropic)** como
-asistente de programación para: estructurar el repositorio, escribir la
-primera versión de los scripts de benchmark, del servidor/cliente MCP, del
-pipeline RAG y del runner de evaluación, y redactar el borrador de este
-reporte. Todas las mediciones se ejecutaron en el hardware descrito y fueron
-revisadas por el autor, que entiende y puede defender cada número. El LLM
-evaluado (llama3.2 3B local) NO se usó para escribir código ni prosa del
-reporte; los LLMs en la nube no participan en ningún camino de inferencia
-del sistema.
+Este proyecto usó **Claude (Anthropic)** como asistente de programación para:
+estructurar el repositorio, escribir la primera versión de los scripts de
+benchmark, del servidor/cliente MCP, del pipeline RAG y del runner de
+evaluación, y redactar el borrador de este reporte. Todas las mediciones se
+ejecutaron en el hardware descrito y fueron revisadas por el autor, que
+entiende y puede defender cada número. El LLM evaluado (llama3.2 3B local) NO
+se usó para escribir código ni prosa del reporte; los LLMs en la nube no
+participan en ningún camino de inferencia del sistema.
