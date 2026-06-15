@@ -1,0 +1,128 @@
+{
+  "Q8_0": [
+    {
+      "id": "math",
+      "category": "matemáticas",
+      "prompt": "A train leaves at 14:30 and arrives at 18:05. It stops for 12 minutes in total. What is the actual moving time in minutes? Show your work briefly.",
+      "check": "Respuesta correcta: 215 - 12 = 203 minutos.",
+      "answer": "To find the actual moving time, we need to subtract the total stop time from the total travel time.\n\nTotal travel time = Arrival time - Departure time\n= 18:05 - 14:30\n= 3 hours 35 minutes\n= 215 minutes (converting to minutes)\n\nTotal stop time = 12 minutes\n\nActual moving time = Total travel time - Total stop time\n= 215 minutes - 12 minutes\n= 203 minutes",
+      "score": 3
+    },
+    {
+      "id": "code",
+      "category": "código",
+      "prompt": "Write a Python function `is_balanced(s)` that returns True if the parentheses (), [], {} in the string are balanced. Only output the code.",
+      "check": "Debe usar una pila, mapear cierres a aperturas y devolver not stack al final. Se valida ejecutándola sobre 5 casos.",
+      "answer": "```python\ndef is_balanced(s):\n    stack = []\n    pairs = {')': '(', '}': '{', ']': '['}\n    \n    for char in s:\n        if char in pairs.values():\n            stack.append(char)\n        elif char in pairs.keys():\n            if not stack or stack.pop() != pairs[char]:\n                return False\n    return not stack\n```",
+      "score": 3
+    },
+    {
+      "id": "summary",
+      "category": "resumen",
+      "prompt": "Summarize in exactly 3 bullet points: 'The Transformer architecture replaced recurrence with self-attention, enabling parallel training over sequences. Its encoder-decoder design uses multi-head attention and positional encodings. Scaling these models led to modern LLMs, but inference cost grows with context length because attention is quadratic and the KV cache grows linearly.'",
+      "check": "3 bullets exactos; debe conservar: self-attention/paralelismo, multi-head+positional encodings, coste de inferencia/KV cache.",
+      "answer": "Here are three bullet points summarizing the text:\n\n• The Transformer architecture replaced recurrence with self-attention, allowing for parallel training over sequences.\n• The encoder-decoder design uses multi-head attention and positional encodings, enabling efficient processing of sequential data.\n• However, as these models scale, inference costs increase due to the quadratic nature of attention and linear growth of the KV cache.",
+      "score": 2
+    },
+    {
+      "id": "factual",
+      "category": "memoria factual",
+      "prompt": "What year was the Python programming language first released, and who created it? Answer in one sentence.",
+      "check": "1991, Guido van Rossum.",
+      "answer": "The Python programming language was first released in 1991 by Guido van Rossum, a Dutch computer programmer.",
+      "score": 3
+    },
+    {
+      "id": "reasoning",
+      "category": "razonamiento",
+      "prompt": "Anna is taller than Berta. Carla is shorter than Berta. Diana is taller than Anna. Who is the second tallest? Explain in two sentences.",
+      "check": "Anna (orden: Diana > Anna > Berta > Carla).",
+      "answer": "Since Anna is taller than Berta and Carla is shorter than Berta, it means that Berta must be between Anna's height and Carla's height. Therefore, Berta is not the tallest, but she is also not the shortest, making her the second tallest among the four individuals mentioned.",
+      "score": 1
+    }
+  ],
+  "Q4_K_M": [
+    {
+      "id": "math",
+      "category": "matemáticas",
+      "prompt": "A train leaves at 14:30 and arrives at 18:05. It stops for 12 minutes in total. What is the actual moving time in minutes? Show your work briefly.",
+      "check": "Respuesta correcta: 215 - 12 = 203 minutos.",
+      "answer": "To find the actual moving time, we need to subtract the total stop time from the total travel time.\n\nTotal travel time = Arrival time - Departure time\n= 18:05 - 14:30\n= 3 hours 35 minutes\n= 215 minutes (converting to minutes)\n\nTotal stop time = 12 minutes\n\nActual moving time = Total travel time - Total stop time\n= 215 minutes - 12 minutes\n= 203 minutes",
+      "score": 3
+    },
+    {
+      "id": "code",
+      "category": "código",
+      "prompt": "Write a Python function `is_balanced(s)` that returns True if the parentheses (), [], {} in the string are balanced. Only output the code.",
+      "check": "Debe usar una pila, mapear cierres a aperturas y devolver not stack al final. Se valida ejecutándola sobre 5 casos.",
+      "answer": "```python\ndef is_balanced(s):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    \n    for char in s:\n        if char in pairs.values():\n            stack.append(char)\n        elif char in pairs.keys():\n            if not stack or stack.pop() != pairs[char]:\n                return False\n    return not stack\n```",
+      "score": 3
+    },
+    {
+      "id": "summary",
+      "category": "resumen",
+      "prompt": "Summarize in exactly 3 bullet points: 'The Transformer architecture replaced recurrence with self-attention, enabling parallel training over sequences. Its encoder-decoder design uses multi-head attention and positional encodings. Scaling these models led to modern LLMs, but inference cost grows with context length because attention is quadratic and the KV cache grows linearly.'",
+      "check": "3 bullets exactos; debe conservar: self-attention/paralelismo, multi-head+positional encodings, coste de inferencia/KV cache.",
+      "answer": "Here are three bullet points summarizing the text:\n\n• The Transformer architecture replaced recurrence with self-attention, allowing for parallel training over sequences.\n• The encoder-decoder design uses multi-head attention and positional encodings, enabling efficient processing of sequential data.\n• Despite its advantages, modern LLMs face scalability issues due to the quadratic growth of inference cost with context length and linear growth of KV cache size.",
+      "score": 2
+    },
+    {
+      "id": "factual",
+      "category": "memoria factual",
+      "prompt": "What year was the Python programming language first released, and who created it? Answer in one sentence.",
+      "check": "1991, Guido van Rossum.",
+      "answer": "The Python programming language was first released in 1991 by Guido van Rossum, a Dutch computer programmer.",
+      "score": 3
+    },
+    {
+      "id": "reasoning",
+      "category": "razonamiento",
+      "prompt": "Anna is taller than Berta. Carla is shorter than Berta. Diana is taller than Anna. Who is the second tallest? Explain in two sentences.",
+      "check": "Anna (orden: Diana > Anna > Berta > Carla).",
+      "answer": "Since Anna is taller than Berta and Carla is shorter than Berta, it means that Berta must be between Anna's height and Carla's height. Therefore, Berta is not the tallest or the shortest, making her the second tallest among the four individuals mentioned.",
+      "score": 1
+    }
+  ],
+  "Q3_K_M": [
+    {
+      "id": "math",
+      "category": "matemáticas",
+      "prompt": "A train leaves at 14:30 and arrives at 18:05. It stops for 12 minutes in total. What is the actual moving time in minutes? Show your work briefly.",
+      "check": "Respuesta correcta: 215 - 12 = 203 minutos.",
+      "answer": "To find the actual moving time, we need to subtract the stop time from the total travel time.\n\nTotal travel time = Arrival time - Departure time\n= 18:05 - 14:30\n= 3 hours 35 minutes\n= 235 minutes (converting to minutes)\n\nStop time = 12 minutes\n\nActual moving time = Total travel time - Stop time\n= 235 minutes - 12 minutes\n= 223 minutes",
+      "score": 1
+    },
+    {
+      "id": "code",
+      "category": "código",
+      "prompt": "Write a Python function `is_balanced(s)` that returns True if the parentheses (), [], {} in the string are balanced. Only output the code.",
+      "check": "Debe usar una pila, mapear cierres a aperturas y devolver not stack al final. Se valida ejecutándola sobre 5 casos.",
+      "answer": "```python\ndef is_balanced(s):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    \n    for char in s:\n        if char in pairs.values():\n            stack.append(char)\n        elif char in pairs.keys():\n            if not stack or stack.pop() != pairs[char]:\n                return False\n    return not stack\n```",
+      "score": 3
+    },
+    {
+      "id": "summary",
+      "category": "resumen",
+      "prompt": "Summarize in exactly 3 bullet points: 'The Transformer architecture replaced recurrence with self-attention, enabling parallel training over sequences. Its encoder-decoder design uses multi-head attention and positional encodings. Scaling these models led to modern LLMs, but inference cost grows with context length because attention is quadratic and the KV cache grows linearly.'",
+      "check": "3 bullets exactos; debe conservar: self-attention/paralelismo, multi-head+positional encodings, coste de inferencia/KV cache.",
+      "answer": "Here are three bullet points summarizing the text:\n\n• The Transformer architecture replaced recurrence with self-attention in NLP models.\n• It uses a multi-head attention mechanism and positional encodings in its encoder-decoder design.\n• This led to the development of modern Large Language Models (LLMs), but also increases inference cost due to quadratic attention and linear KV cache growth.",
+      "score": 2
+    },
+    {
+      "id": "factual",
+      "category": "memoria factual",
+      "prompt": "What year was the Python programming language first released, and who created it? Answer in one sentence.",
+      "check": "1991, Guido van Rossum.",
+      "answer": "The Python programming language was first released in 1991 by Guido van Rossum, a Dutch computer programmer.",
+      "score": 3
+    },
+    {
+      "id": "reasoning",
+      "category": "razonamiento",
+      "prompt": "Anna is taller than Berta. Carla is shorter than Berta. Diana is taller than Anna. Who is the second tallest? Explain in two sentences.",
+      "check": "Anna (orden: Diana > Anna > Berta > Carla).",
+      "answer": "Based on the information, we can deduce that Berta is not the tallest since Anna and Diana are both taller than her. Since Diana is taller than Anna, and Anna is taller than Berta, Diana must be the second tallest among the four individuals.",
+      "score": 1
+    }
+  ]
+}

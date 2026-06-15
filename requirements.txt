@@ -1,0 +1,13 @@
+# Versiones fijadas (reproducibilidad — Parte "Code & Reproducibility")
+# LLM local
+ollama==0.6.2
+python-dotenv==1.2.2
+# RAG (Parte C)
+sqlite-vec==0.1.9
+# MCP (Parte D)
+mcp==1.27.2
+# Benchmarks y gráficas (Partes A, B, E)
+psutil==7.2.2
+matplotlib==3.11.0
+pandas==3.0.3
+numpy==2.4.6
