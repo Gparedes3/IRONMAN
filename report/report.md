@@ -19,11 +19,12 @@ efecto de tres niveles de cuantización (Q8_0, Q4_K_M, Q3_K_M) sobre tamaño,
 RAM y velocidad; verificamos el crecimiento aproximadamente lineal del KV
 cache entre 512 y 16 384 tokens de contexto y el ahorro de cuantizarlo a Q8;
 y evaluamos el sistema completo con un test set reproducible de 21 prompts en
-cinco categorías. El hallazgo principal: Q4_K_M es el mejor compromiso
-—~1.7× más tokens/s que Q8_0 con idéntica calidad media (2.4/3)—, mientras
-Q3_K_M la degrada a 2.0 al fallar la aritmética; y el KV cache medido crece
-~117 KB/token, casi exactamente los 112 KB/token teóricos, confirmando su
-crecimiento lineal con el contexto.
+cinco categorías. El hallazgo principal: Q4_K_M es el mejor compromiso —~1.7×
+más tokens/s que Q8_0 con idéntica calidad (2.4/3)—; en estas 5 pruebas las
+tres cuantizaciones empatan en 2.4/3, así que la elección Q4 frente a Q3 se
+apoya en el margen de fiabilidad, no en la calidad medida. El KV cache crece
+~117 KB/token, casi los 112 KB/token teóricos, confirmando su crecimiento
+lineal con el contexto.
 
 # 2. Arquitectura del sistema
 
@@ -74,9 +75,9 @@ Q3_K_M (1.7 GB), servidos por Ollama 0.30.6. Embeddings: nomic-embed-text
 (`eval_count/eval_duration` para generación; `prompt_eval_*` para prefill).
 RAM pico: muestreo cada 200 ms del working-set de todos los procesos
 `ollama*` durante la inferencia (psutil). Velocidad: completación fija de
-200 tokens, media de 3 repeticiones. Calidad: 5 prompts estandarizados
-(matemáticas, código, resumen, memoria factual, razonamiento) puntuados 0–3
-con la rúbrica escrita de `rubrica.md`; el prompt de código se
+200 tokens, media de 3 repeticiones. Calidad: 5 prompts estandarizados **en
+español** (matemáticas, código, resumen, memoria factual, razonamiento)
+puntuados 0–3 con la rúbrica escrita de `rubrica.md`; el prompt de código se
 valida además ejecutándolo sobre 5 casos de prueba.
 
 **Corpus RAG.** Documentación oficial de Ollama (repo GitHub + web
@@ -103,22 +104,26 @@ seco para poder repetir la evaluación sin enviar correos reales.
 |---|---|---|---|---|---|
 | Q8_0   | 3.19 | 5558 | 230.4 | 11.23 | 2.4 |
 | Q4_K_M | 1.88 | 2545 | 524.4 | 19.24 | 2.4 |
-| Q3_K_M | 1.57 | 1985 | 581.2 | 22.52 | 2.0 |
+| Q3_K_M | 1.57 | 1985 | 581.2 | 22.52 | 2.4 |
 
 ![Tamaño vs velocidad vs calidad](plot_quant.png)
 
 Bajar de Q8_0 a Q4_K_M reduce el peso a la mitad (3.19→1.88 GB) y la RAM pico
 a menos de la mitad (5.6→2.5 GB), y a la vez **acelera** la generación 1.7×
-(11.2→19.2 tok/s) y el prefill 2.3× —sin coste de calidad: ambos puntúan 2.4/3
-en la rúbrica. Q3_K_M es algo más rápido (22.5 tok/s) y ligero (1.57 GB), pero
-su calidad cae a 2.0 porque empieza a fallar tareas exactas: en el problema
-aritmético calcula mal la duración del trayecto (235 en vez de 215 min). Esto
-justifica la elección de **Q4_K_M** como configuración de trabajo: es la rodilla
-de la curva, donde se gana toda la velocidad y memoria de cuantizar sin perder
-calidad. Frente a un hipotético Q5_K_M, Q4_K_M ya iguala la calidad de Q8 en
-nuestra rúbrica, así que el medio nivel extra de Q5 solo añadiría peso y RAM sin
-retorno medible. (Las tres fallan el acertijo de razonamiento transitivo, un
-límite del tamaño 3B que se discute en la Parte F, no de la cuantización.)
+(11.2→19.2 tok/s) y el prefill 2.3×, **sin coste de calidad**: ambos puntúan
+2.4/3. En estas 5 preguntas (en español) las tres cuantizaciones empatan en
+2.4/3: las tres aciertan el problema aritmético y el de código, las tres añaden
+un preámbulo en el resumen, y las tres fallan el acertijo de razonamiento
+transitivo (un límite del tamaño 3B, no de la cuantización; se discute en la
+Parte F). Por tanto, la decisión **Q4_K_M** no se justifica por la calidad
+—pareja aquí, con un n=5 pequeño— sino por el equilibrio: frente a Q8_0 gana
+1.7× de velocidad y la mitad de RAM sin perder nada; frente a Q3_K_M la ganancia
+de velocidad es pequeña (19→22 tok/s) y Q3_K_M es una cuantización más agresiva,
+con mayor riesgo de degradar en tareas más difíciles que estas 5 no expusieron.
+Frente a un hipotético Q5_K_M, Q4_K_M ya iguala la calidad de Q8, así que el
+medio nivel extra de Q5 solo añadiría peso y RAM sin retorno. (Nota: en una
+corrida previa en inglés, Q3_K_M fallaba la aritmética y bajaba a 2.0; en español
+la acierta, lo que muestra la sensibilidad de un n=5 al idioma del prompt.)
 
 ## 4.2 Parte B — KV cache
 
@@ -158,9 +163,17 @@ hardware el KV-Q8 conviene solo cuando la RAM es el cuello de botella (contextos
 
 ## 4.3 Parte C — RAG
 
+Las 5 preguntas se hacen **en inglés** a propósito: el corpus (docs de Ollama y
+llama.cpp) está en inglés, y consultar un corpus en su propio idioma es la
+prueba justa del RAG. Lo verificamos empíricamente: al preguntar en español
+sobre documentos en inglés, la recuperación se degrada por el desajuste de
+idioma (cross-lingual) y la media con RAG cae a ~0.6/3, frente a 1.8/3 con
+preguntas en inglés. Las respuestas en inglés y su traducción al español están
+en `resultados/compare_results.json`.
+
 | Pregunta (resumen) | Sin RAG (0–3) | Con RAG (0–3) |
 |---|---|---|
-| Variable que mueve el directorio de modelos (`OLLAMA_MODELS`) | 0 | 3 |
+| Variable del directorio de modelos (`OLLAMA_MODELS`) | 0 | 3 |
 | Escuchar en todas las interfaces (`OLLAMA_HOST=0.0.0.0`) | 1 | 2 |
 | Qué controla `--n-gpu-layers` en llama.cpp | 0 | 3 |
 | Cuánto mantiene un modelo en memoria por defecto | 0 | 1 |
@@ -235,18 +248,21 @@ discute como limitación del evaluador en la Parte F.
 
 Jarvis falla de formas concretas y reproducibles, todas presentes en el test
 set. **(1) Razonamiento multi-paso del propio modelo.** El acertijo de altura
-relativa (Anna/Berta/Carla/Diana) lo fallan las tres cuantizaciones en la Parte
+relativa (Ana/Berta/Carla/Diana) lo fallan las tres cuantizaciones en la Parte
 A y vuelve a fallar en `chat-04`: el modelo concluye que "no hay segundo más
-alto" cuando la respuesta es Anna. Es un límite del tamaño 3B, no de la
+alto" cuando la respuesta es Ana. Es un límite del tamaño 3B, no de la
 cuantización ni del RAG. **(2) Tool calling frágil.** En `tool-02` la llamada
 sale como texto JSON en vez de invocar la herramienta, y en `multi-01`/`multi-03`
 el encadenamiento de dos tools se queda a medias o con argumentos vacíos; sin el
 fallback `_tool_call_in_text` la tasa de tool calling caería bastante más.
 **(3) Sobre-uso de herramientas.** Preguntas de chat puro disparan `search_docs`
 sin necesidad (fotosíntesis, haiku), lo que provocó el pico de latencia de
-126.7 s y una excepción en `chat-02`. **(4) Extracción factual imperfecta.** En
-el RAG, con el documento correcto recuperado, el modelo aún responde "0 segundos"
-donde la doc dice 5 minutos (`rag-03`), o "no lo sé" teniendo la fuente delante.
+126.7 s y una excepción en `chat-02`. **(4) Extracción factual imperfecta y
+sensibilidad al idioma.** En el RAG, con el documento correcto recuperado, el
+modelo aún responde "0 segundos" donde la doc dice 5 minutos (`rag-03`), o "no
+lo sé" teniendo la fuente delante; y preguntar en español sobre un corpus en
+inglés degrada la recuperación (1.8 → 0.6), por lo que conviene igualar el
+idioma de la pregunta y del corpus.
 
 Cualitativamente, un LLM en la nube (probado informalmente con los mismos
 prompts) acierta el acertijo de razonamiento, no abusa de herramientas y extrae

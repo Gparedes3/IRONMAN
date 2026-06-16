@@ -1,86 +1,83 @@
 [
   {
+    "_nota": "Las preguntas van en INGLÉS porque el corpus (docs de Ollama y llama.cpp) está en inglés; consultar un corpus en su idioma es la prueba justa del RAG. 'answer' = respuesta real del modelo; 'answer_es' = traducción al español (referencia, no es salida del modelo).",
     "question": "Which environment variable changes the directory where Ollama stores its models?",
-    "check": "OLLAMA_MODELS (docs/faq.md).",
+    "check": "OLLAMA_MODELS (faq.md).",
     "with_rag": {
       "answer": "The environment variable that changes the directory where Ollama stores its models is `OLLAMA_MODELS`.",
-      "sources": [
-        "ollama-site/faq.md",
-        "ollama-site/windows.md",
-        "ollama-site/windows.md",
-        "ollama-site/faq.md"
-      ],
-      "latency_s": 20.5,
-      "score": 3
+      "answer_es": "La variable de entorno que cambia el directorio donde Ollama guarda sus modelos es `OLLAMA_MODELS`.",
+      "sources": ["ollama-site/faq.md", "ollama-site/windows.md", "ollama-site/faq.md"],
+      "latency_s": 19.3,
+      "score": 3,
+      "score_motivo": "Correcta y exacta: OLLAMA_MODELS."
     },
     "without_rag": {
-      "answer": "The environment variable that changes the directory where OpenLMN (not Ollama) stores its models is `OPENLMN_MODEL_DIR`.\n\nHowever, I couldn't find any information on an environment variable called `OLLAMA_MODEL_DIR`. It's possible that you meant to ask about OpenLMN or another library.",
+      "answer": "The environment variable that changes the directory where OpenLMN (not Ollama) stores its models is `OPENLMN_MODEL_DIR`. However, I couldn't find any information on an environment variable called `OLLAMA_MODEL_DIR`.",
+      "answer_es": "La variable de entorno que cambia el directorio donde OpenLMN (no Ollama) guarda sus modelos es `OPENLMN_MODEL_DIR`. Sin embargo, no encontré información sobre una variable llamada `OLLAMA_MODEL_DIR`.",
       "sources": [],
-      "latency_s": 4.5,
-      "score": 0
+      "latency_s": 4.0,
+      "score": 0,
+      "score_motivo": "Alucina: inventa OPENLMN_MODEL_DIR, no existe."
     }
   },
   {
     "question": "How do you allow Ollama to listen on all network interfaces instead of only localhost?",
-    "check": "OLLAMA_HOST=0.0.0.0 (docs/faq.md).",
+    "check": "OLLAMA_HOST=0.0.0.0 (faq.md).",
     "with_rag": {
-      "answer": "You can allow Ollama to listen on all network interfaces by setting the environment variable `OLLAMA_HOST` to `0.0.0.0`. \n\nFor example, with Nginx:\n\n```nginx theme={\"system\"}\nserver {\n    listen 80;\n    server_name example.com;  # Replace with your domain or IP\n    location / {\n        proxy_pass http://0.0.0.0:11434;\n        proxy_set_header Host 0.0.0.0:11434;\n    }\n}\n```\n\nAlternatively, you can set the environment variable `OLLAMA_HOST` to `0.0.0.0`:\n\n```shell theme={\"system\"}\nexport OLLAMA_HOST=0.0.0.0\n```\n\nThis will allow Ollama to listen on all network interfaces instead of only localhost.",
-      "sources": [
-        "ollama-site/faq.md",
-        "ollama-site/faq.md",
-        "ollama-site/faq.md",
-        "ollama-site/faq.md"
-      ],
-      "latency_s": 24.1,
-      "score": 2
+      "answer": "You can allow Ollama to listen on all network interfaces by setting the environment variable `OLLAMA_HOST` to `0.0.0.0`. (...) export OLLAMA_HOST=0.0.0.0. This will allow Ollama to listen on all network interfaces instead of only localhost.",
+      "answer_es": "Puedes permitir que Ollama escuche en todas las interfaces de red poniendo la variable de entorno `OLLAMA_HOST` a `0.0.0.0`. (...) export OLLAMA_HOST=0.0.0.0. Esto hará que Ollama escuche en todas las interfaces en vez de solo en localhost.",
+      "sources": ["ollama-site/faq.md"],
+      "latency_s": 21.8,
+      "score": 2,
+      "score_motivo": "Correcta (OLLAMA_HOST=0.0.0.0) pero verbosa, con un bloque de Nginx irrelevante."
     },
     "without_rag": {
-      "answer": "To allow `ollama` to listen on all network interfaces instead of only localhost, you can modify the configuration file that specifies the listening addresses.\n\nBy default, `ollama` listens on `localhost:8080`. To change this, you can edit the `ollama.conf` file (or the equivalent configuration file for your specific installation) and update the `listen_address` or `bind_address` setting to a wildcard address, such as `0.0.0.0`.\n\nHere's an example of how you might modify the `ollama.conf` file:\n```\n[ollama]\nlisten_address = 0.0.0.0:8080\n```\nAlternatively, you can also use the `--bind-address` command-line option to specify the listening address.\n\nFor example:\n```bash\nollama --bind-address=0.0.0.0:8080\n```\nNote that allowing `ollama` to listen on all network interfaces may pose security risks if not done carefully, as it can expose your system to external connections. Be sure to weigh the benefits against the potential risks and take appropriate measures to secure your system.\n\nAlso, please note that I'm assuming you are using a specific version of Ollama, if you're using a different version or a different implementation, the configuration file and options might be different.",
+      "answer": "By default, `ollama` listens on `localhost:8080`. Edit the `ollama.conf` file and set listen_address to 0.0.0.0:8080. Alternatively use --bind-address=0.0.0.0:8080.",
+      "answer_es": "Por defecto, `ollama` escucha en `localhost:8080`. Edita el archivo `ollama.conf` y pon listen_address a 0.0.0.0:8080. O usa --bind-address=0.0.0.0:8080.",
       "sources": [],
-      "latency_s": 16.1,
-      "score": 1
+      "latency_s": 14.2,
+      "score": 1,
+      "score_motivo": "Menciona 0.0.0.0 pero por un mecanismo inventado (ollama.conf, puerto 8080); el real es la variable OLLAMA_HOST."
     }
   },
   {
     "question": "According to the llama.cpp docs, what does the -ngl / --n-gpu-layers flag control?",
     "check": "Cuántas capas del modelo se descargan a la GPU.",
     "with_rag": {
-      "answer": "The `-ngl` or `--n-gpu-layers` flag controls how many layers are offloaded to the GPU. When running llama, it will offload the maximum possible number of layers to the GPU, even if it's less than the number you configured.",
-      "sources": [
-        "llamacpp/docs/development/token_generation_performance_tips.md",
-        "llamacpp/docs/docker.md",
-        "llamacpp/docs/multi-gpu.md",
-        "llamacpp/docs/build.md"
-      ],
-      "latency_s": 16.8,
-      "score": 3
+      "answer": "The `-ngl` or `--n-gpu-layers` flag controls how many layers are offloaded to the GPU. When running llama, it will offload the maximum possible number of layers to the GPU.",
+      "answer_es": "El flag `-ngl` o `--n-gpu-layers` controla cuántas capas se descargan a la GPU. Al ejecutar llama, descargará el máximo número posible de capas a la GPU.",
+      "sources": ["llamacpp/docs/development/token_generation_performance_tips.md", "llamacpp/docs/multi-gpu.md", "llamacpp/docs/build.md"],
+      "latency_s": 14.7,
+      "score": 3,
+      "score_motivo": "Correcta: número de capas descargadas a la GPU."
     },
     "without_rag": {
-      "answer": "I cannot provide information on a specific compiler flag without more context. The documentation for the `-ngl` or `--n-gpu-layers` flag is not available in my knowledge base. \n\nHowever, I can tell you that this flag is likely related to the OpenCL framework used by the Llama compiler. In OpenCL, the `-ngl` flag controls the number of GPU layers to use when compiling a kernel.",
+      "answer": "I cannot provide information on a specific compiler flag. (...) this flag is likely related to the OpenCL framework. In OpenCL, the `-ngl` flag controls the number of GPU layers to use when compiling a kernel.",
+      "answer_es": "No puedo dar información sobre ese flag. (...) probablemente está relacionado con OpenCL; en OpenCL el flag `-ngl` controla el número de capas de GPU al compilar un kernel.",
       "sources": [],
-      "latency_s": 5.6,
-      "score": 0
+      "latency_s": 5.1,
+      "score": 0,
+      "score_motivo": "Alucina: lo atribuye a OpenCL y a compilar kernels, falso."
     }
   },
   {
     "question": "How long does Ollama keep a model loaded in memory by default, and how can you change it?",
-    "check": "5 minutos; keep_alive / OLLAMA_KEEP_ALIVE (docs/faq.md).",
+    "check": "5 minutos; keep_alive / OLLAMA_KEEP_ALIVE (faq.md).",
     "with_rag": {
-      "answer": "According to the documentation, Ollama keeps a model loaded in memory for 0 seconds by default (as specified by the `keep_alive` parameter with value 0). To change this, you can set the `OLLAMA_KEEP_ALIVE` environment variable when starting the Ollama server.",
-      "sources": [
-        "ollama-site/faq.md",
-        "ollama-site/faq.md",
-        "ollama-site/faq.md",
-        "ollama-site/faq.md"
-      ],
-      "latency_s": 18.6,
-      "score": 1
+      "answer": "According to the documentation, Ollama keeps a model loaded in memory for 0 seconds by default (keep_alive = 0). To change this, set the `OLLAMA_KEEP_ALIVE` environment variable.",
+      "answer_es": "Según la documentación, Ollama mantiene un modelo en memoria 0 segundos por defecto (keep_alive = 0). Para cambiarlo, define la variable de entorno `OLLAMA_KEEP_ALIVE`.",
+      "sources": ["ollama-site/faq.md"],
+      "latency_s": 14.2,
+      "score": 1,
+      "score_motivo": "Acierta la variable (OLLAMA_KEEP_ALIVE) pero da mal el valor por defecto: dice 0 s, son 5 minutos."
     },
     "without_rag": {
-      "answer": "I'm not familiar with the specific details of OLLAMA's behavior regarding model loading. However, I can tell you that OLLAMA is an open-source library for natural language inference tasks.\n\nIf you're looking for information on how to configure or modify the behavior of OLLAMA in terms of model loading, I would recommend checking out the official documentation or source code for OLLAMA. This should provide more detailed information on any available configuration options or settings that can be used to control how models are loaded into memory.\n\nAlternatively, you may want to consider reaching out to the developers or maintainers of OLLAMA directly, as they would likely be able to provide more specific guidance on configuring model loading behavior.",
+      "answer": "I'm not familiar with the specific details of OLLAMA's behavior regarding model loading. I would recommend checking the official documentation.",
+      "answer_es": "No conozco los detalles de cómo Ollama carga los modelos. Recomiendo revisar la documentación oficial.",
       "sources": [],
-      "latency_s": 9.5,
-      "score": 0
+      "latency_s": 7.8,
+      "score": 0,
+      "score_motivo": "No responde, divaga."
     }
   },
   {
@@ -88,20 +85,19 @@
     "check": "GGUF; el Modelfile define modelo base, plantilla, system prompt y parámetros.",
     "with_rag": {
       "answer": "I don't know. The documentation excerpts do not contain the answer to this question.",
-      "sources": [
-        "ollama-site/modelfile.md",
-        "ollama-site/import.md",
-        "ollama-site/modelfile.md",
-        "api.md"
-      ],
-      "latency_s": 13.8,
-      "score": 0
+      "answer_es": "No lo sé. Los extractos de documentación no contienen la respuesta.",
+      "sources": ["ollama-site/modelfile.md", "ollama-site/import.md", "api.md"],
+      "latency_s": 12.5,
+      "score": 0,
+      "score_motivo": "Fallo de EXTRACCIÓN: tenía modelfile.md entre las fuentes pero dijo que no sabía."
     },
     "without_rag": {
-      "answer": "I couldn't find any information on \"Ollama\" being a known AI framework or library. It's possible that it's a custom or proprietary technology.\n\nHowever, I can tell you about the file formats used by some popular AI frameworks:\n\n* TensorFlow: The default file format for model weights is TensorFlow Model Archive Format (TFRecord), but it also supports other formats like Binary Protocol Buffer (protobuf) and HDF5.\n* PyTorch: The default file format for model weights is PyTorch Model File (.pt or .pth), but it also supports other formats like HDF5 and ONNX.\n\nRegarding Modelfile, I couldn't find any information on a specific file format with that name. However, there are several file formats used in the field of machine learning and deep learning, such as:\n\n* ONNX (Open Neural Network Exchange): A format for representing neural networks in a platform-agnostic way.\n* HDF5: A binary format for storing large datasets and models.\n* TFRecord: A format for storing data in a compressed and efficient way.\n\nIf you have any more information about Ollama or Modelfile, I may be able to provide more specific answers.",
+      "answer": "I couldn't find any information on 'Ollama' being a known AI framework. (...) TensorFlow uses TFRecord/protobuf/HDF5; PyTorch uses .pt/.pth; ONNX, HDF5...",
+      "answer_es": "No encontré información sobre 'Ollama' como framework conocido. (...) TensorFlow usa TFRecord/protobuf/HDF5; PyTorch usa .pt/.pth; ONNX, HDF5...",
       "sources": [],
-      "latency_s": 14.3,
-      "score": 0
+      "latency_s": 12.8,
+      "score": 0,
+      "score_motivo": "Alucina: habla de TensorFlow/PyTorch, no menciona GGUF."
     }
   }
 ]

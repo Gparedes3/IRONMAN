@@ -44,6 +44,10 @@ OVERLAP_CHARS = 150                 # solape entre trozos para no cortar ideas
 TOP_K = 4                           # cuántos trozos se recuperan por pregunta
 
 # Plantilla que obliga al modelo a responder SOLO con lo recuperado.
+# NOTA: la plantilla y las preguntas van en INGLÉS a propósito, porque el corpus
+# (docs de Ollama y llama.cpp) está en inglés. Consultar un corpus en su propio
+# idioma es la prueba justa del RAG; preguntar en español sobre documentos en
+# inglés degrada la recuperación (lo verificamos: ver informe, Parte C).
 RAG_TEMPLATE = """Answer the question using ONLY the documentation excerpts below.
 If the excerpts do not contain the answer, say you don't know.
 

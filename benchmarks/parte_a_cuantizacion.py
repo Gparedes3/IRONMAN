@@ -34,34 +34,35 @@ from medir_comun import OLLAMA_HOST, model_file_size_mb, stop_model, timed_gener
 # ----------------------------------------------------------------------------
 QUALITY_PROMPTS = [
     {"id": "math", "category": "matemáticas",
-     "prompt": ("A train leaves at 14:30 and arrives at 18:05. It stops for 12 "
-                "minutes in total. What is the actual moving time in minutes? "
-                "Show your work briefly."),
+     "prompt": ("Un tren sale a las 14:30 y llega a las 18:05. Se detiene 12 "
+                "minutos en total. ¿Cuál es el tiempo real en movimiento, en "
+                "minutos? Muestra brevemente tu razonamiento."),
      "check": "Respuesta correcta: 215 - 12 = 203 minutos."},
     {"id": "code", "category": "código",
-     "prompt": ("Write a Python function `is_balanced(s)` that returns True if "
-                "the parentheses (), [], {} in the string are balanced. Only "
-                "output the code."),
+     "prompt": ("Escribe una función de Python `is_balanced(s)` que devuelva True "
+                "si los paréntesis (), [], {} de la cadena están balanceados. "
+                "Devuelve solo el código."),
      "check": ("Debe usar una pila y devolver not stack al final. Se valida "
                "ejecutándola sobre 5 casos.")},
     {"id": "summary", "category": "resumen",
-     "prompt": ("Summarize in exactly 3 bullet points: 'The Transformer "
-                "architecture replaced recurrence with self-attention, enabling "
-                "parallel training over sequences. Its encoder-decoder design "
-                "uses multi-head attention and positional encodings. Scaling "
-                "these models led to modern LLMs, but inference cost grows with "
-                "context length because attention is quadratic and the KV cache "
-                "grows linearly.'"),
-     "check": "3 bullets; conservar self-attention, multi-head, KV cache."},
+     "prompt": ("Resume en exactamente 3 viñetas: 'La arquitectura Transformer "
+                "reemplazó la recurrencia por la auto-atención, permitiendo el "
+                "entrenamiento paralelo sobre secuencias. Su diseño codificador-"
+                "decodificador usa atención multi-cabeza y codificaciones "
+                "posicionales. Escalar estos modelos llevó a los LLM modernos, "
+                "pero el coste de inferencia crece con la longitud del contexto "
+                "porque la atención es cuadrática y la caché KV crece "
+                "linealmente.'"),
+     "check": "3 viñetas; conservar auto-atención, multi-cabeza, caché KV."},
     {"id": "factual", "category": "memoria factual",
-     "prompt": ("What year was the Python programming language first released, "
-                "and who created it? Answer in one sentence."),
+     "prompt": ("¿En qué año se lanzó por primera vez el lenguaje de "
+                "programación Python y quién lo creó? Responde en una sola frase."),
      "check": "1991, Guido van Rossum."},
     {"id": "reasoning", "category": "razonamiento",
-     "prompt": ("Anna is taller than Berta. Carla is shorter than Berta. Diana "
-                "is taller than Anna. Who is the second tallest? Explain in two "
-                "sentences."),
-     "check": "Anna (orden: Diana > Anna > Berta > Carla)."},
+     "prompt": ("Ana es más alta que Berta. Carla es más baja que Berta. Diana "
+                "es más alta que Ana. ¿Quién es la segunda más alta? Explica en "
+                "dos frases."),
+     "check": "Ana (orden: Diana > Ana > Berta > Carla)."},
 ]
 
 # Los tres niveles de cuantización del mismo modelo base.
@@ -73,8 +74,8 @@ MODELS = [
 
 # Prompt fijo para medir velocidad: pide texto largo para que no pare antes
 # de los 200 tokens.
-SPEED_PROMPT = ("Explain in detail how a refrigerator works, covering the "
-                "compressor, condenser, expansion valve and evaporator.")
+SPEED_PROMPT = ("Explica en detalle cómo funciona un refrigerador, cubriendo el "
+                "compresor, el condensador, la válvula de expansión y el evaporador.")
 SPEED_RUNS = 3      # se mide 3 veces y se promedia
 NUM_CTX = 2048      # contexto fijo en la Parte A (la Parte B lo varía)
 
