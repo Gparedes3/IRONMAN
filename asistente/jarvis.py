@@ -84,7 +84,7 @@ class MCPClient:
         async def _call():
             result = await self._session.call_tool(name, arguments)
             return "\n".join(c.text for c in result.content if getattr(c, "text", None))
-        return asyncio.run_coroutine_threadsafe(_call(), self._loop).result(timeout=120)
+        return asyncio.run_coroutine_threadsafe(_call(), self._loop).result(timeout=300)
 
     def ollama_tools(self) -> list[dict]:
         """Traduce las herramientas MCP al formato que entiende Ollama."""

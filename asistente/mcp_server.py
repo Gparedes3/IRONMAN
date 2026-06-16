@@ -36,6 +36,11 @@ from mcp.server.fastmcp import FastMCP
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+# Importamos el RAG AL ARRANCAR (en el hilo principal), no dentro de la
+# herramienta. Hacerlo dentro de search_docs lo ejecutaba en un hilo de trabajo
+# y podía bloquear el servidor (deadlock del import). Aquí queda precargado.
+from rag.parte_c_rag import retrieve  # noqa: E402
+
 # Carga las credenciales del archivo .env (correo, etc.). Nunca van en el código.
 load_dotenv(ROOT / ".env")
 EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS", "").strip()
@@ -150,8 +155,12 @@ def search_docs(query: str) -> str:
     """Busca en la base de conocimiento local (docs de Ollama y llama.cpp) y
     devuelve los fragmentos más relevantes. Úsala para preguntas técnicas sobre
     Ollama, llama.cpp, GGUF, cuantización o configuración."""
-    from rag.parte_c_rag import retrieve  # import aquí para no cargar el RAG si no se usa
-    hits = retrieve(query, k=4)
+    # 'retrieve' ya está importado arriba. Capturamos errores para devolverlos
+    # como texto en vez de quedarnos colgados (mejor para depurar y para la demo).
+    try:
+        hits = retrieve(query, k=4)
+    except Exception as e:
+        return f"Error al buscar en los documentos: {type(e).__name__}: {e}"
     if not hits:
         return "No se encontró nada relevante en la base de conocimiento."
     return "\n\n---\n\n".join(f"[{h['source']}]\n{h['text']}" for h in hits)

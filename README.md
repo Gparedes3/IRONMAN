@@ -5,8 +5,8 @@ Ollama (solo CPU), busca en documentos con **RAG** y usa herramientas (correo,
 abrir apps, búsqueda) expuestas con un servidor **MCP** propio. Ningún LLM en
 la nube en el camino de inferencia.
 
-> Informe técnico: [`report/report.pdf`](report/report.pdf)
-> Vídeo de demo: [enlace pendiente](#demo)
+> Informe técnico (IEEE): [`report/report_ieee.pdf`](report/report_ieee.pdf)
+> Vídeo de demo (3–5 min): https://drive.google.com/file/d/1ehPTWT7IrVgB5lVMTKkQ_-QI96_kKK2l/view?usp=sharing
 
 ## Estructura del proyecto (una carpeta por parte)
 
@@ -24,7 +24,7 @@ la nube en el camino de inferencia.
 | `rag/index.db` | Índice vectorial del RAG | C |
 | `evaluacion/parte_e_evaluacion.py` | Corre el test de 21 preguntas | E |
 | `evaluacion/test_set.json` | Las 21 preguntas de evaluación | E |
-| `report/` | Informe, gráficas y PDF | — |
+| `report/report_ieee.pdf` | Informe técnico en formato IEEE (+ `.tex` fuente) | — |
 | `resultados/` | Salidas para puntuar (calidad, RAG, evaluación) | A, C, E |
 | `docs/` | Diagramas de arquitectura | — |
 | `measurements.csv` | Todos los números medidos | A, B |
@@ -70,4 +70,5 @@ enunciado).
 
 ## Demo
 
-Vídeo (3–5 min): _enlace pendiente_.
+Vídeo (3–5 min) mostrando chat, RAG y una herramienta MCP en vivo:
+https://drive.google.com/file/d/1ehPTWT7IrVgB5lVMTKkQ_-QI96_kKK2l/view?usp=sharing
