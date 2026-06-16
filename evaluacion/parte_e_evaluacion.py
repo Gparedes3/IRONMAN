@@ -28,14 +28,18 @@ Cómo se ejecuta:
 """
 import argparse
 import json
+import sys
 import time
 from collections import defaultdict
 from pathlib import Path
 
-# Reutilizamos el cerebro del asistente (definido en jarvis.py).
-from jarvis import LLM, MCPClient
+HERE = Path(__file__).resolve().parent   # carpeta evaluacion/
+ROOT = HERE.parent                       # raíz del proyecto
+sys.path.insert(0, str(ROOT))            # para poder importar asistente.jarvis
 
-ROOT = Path(__file__).resolve().parent
+# Reutilizamos el cerebro del asistente (definido en asistente/jarvis.py).
+from asistente.jarvis import LLM, MCPClient
+
 RESULTS_DIR = ROOT / "resultados"
 
 # Herramientas que CAMBIAN cosas (por eso se simulan salvo --live).
@@ -69,7 +73,7 @@ def main():
     args = ap.parse_args()
     only = {c.strip() for c in args.only.split(",") if c.strip()}
 
-    tests = json.loads((ROOT / "test_set.json").read_text(encoding="utf-8"))["tests"]
+    tests = json.loads((HERE / "test_set.json").read_text(encoding="utf-8"))["tests"]
     if only:
         tests = [t for t in tests if t["category"] in only]
 

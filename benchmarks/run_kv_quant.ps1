@@ -4,7 +4,7 @@
 # parar la app de la bandeja y lanzar un servidor temporal con esa variable.
 # La cuantización del KV cache necesita flash attention activado.
 #
-# Uso (desde la carpeta del proyecto):  .\run_kv_quant.ps1
+# Uso (desde la raíz del proyecto):  .\benchmarks\run_kv_quant.ps1
 
 Write-Host "Parando Ollama (app de bandeja y servidor)..."
 Get-Process -Name "ollama*" -ErrorAction SilentlyContinue | Stop-Process -Force
@@ -17,7 +17,7 @@ $server = Start-Process -FilePath "ollama" -ArgumentList "serve" -PassThru -Wind
 Start-Sleep -Seconds 5
 
 Write-Host "Ejecutando benchmark (filas etiquetadas kv_cache_type=q8_0)..."
-& .\.venv\Scripts\python.exe parte_b_kvcache.py --kv q8_0
+& .\.venv\Scripts\python.exe benchmarks\parte_b_kvcache.py --kv q8_0
 
 Write-Host "Parando servidor temporal..."
 Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue

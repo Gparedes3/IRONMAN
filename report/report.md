@@ -2,8 +2,8 @@
 title: "IRONMAN: un Jarvis local en CPU — cuantización, KV cache, RAG y herramientas MCP"
 author: "Guillermo Paredes — Applied Machine Learning: Local LLM Systems"
 date: "Junio 2026"
-geometry: margin=2.2cm
-fontsize: 10pt
+geometry: margin=2cm
+fontsize: 9pt
 ---
 
 # 1. Abstract
@@ -14,7 +14,7 @@ El sistema combina un modelo llama3.2 de 3B parámetros servido por Ollama, un
 pipeline RAG local (nomic-embed-text + sqlite-vec) sobre ~202 páginas de
 documentación técnica, y seis herramientas expuestas mediante un servidor
 propio del Model Context Protocol (MCP), incluyendo correo IMAP/SMTP y control
-del PC. La interfaz principal es de texto (`jarvis.py`). Medimos el
+del PC. La interfaz principal es de texto (`asistente/jarvis.py`). Medimos el
 efecto de tres niveles de cuantización (Q8_0, Q4_K_M, Q3_K_M) sobre tamaño,
 RAM y velocidad; verificamos el crecimiento aproximadamente lineal del KV
 cache entre 512 y 16 384 tokens de contexto y el ahorro de cuantizarlo a Q8;
@@ -34,12 +34,12 @@ crecimiento lineal con el contexto.
 herramientas (MCP) y la recuperación (RAG). Ningún componente de inferencia
 sale a la nube.*
 
-La interfaz del núcleo es de texto (`jarvis.py`), la misma que usa la
+La interfaz del núcleo es de texto (`asistente/jarvis.py`), la misma que usa la
 evaluación automática de la Parte E. Todas las llamadas de inferencia fijan
 `num_gpu: 0`: el equipo tiene una RTX 4060 que se deshabilita explícitamente
 para cumplir la restricción de hardware del enunciado.
 
-El servidor MCP propio (`mcp_server.py`) expone seis herramientas por
+El servidor MCP propio (`asistente/mcp_server.py`) expone seis herramientas por
 stdio: `fetch_recent_emails` y `send_email` (Gmail IMAP/SMTP), `open_app`,
 `open_website` y `web_search` (control del PC y búsqueda), y `search_docs`
 (puente al RAG sobre top-4 de 1134 chunks del corpus de docs de Ollama
@@ -91,7 +91,7 @@ párrafos con solape de 150; almacenamiento en sqlite-vec.
 **Test set.** 21 prompts en 5 categorías (chat puro, RAG, herramienta,
 multi-paso, adversarial), cada uno con un tipo de resultado esperado
 declarado (tools requeridas/prohibidas, palabras clave). Runner automático
-(`parte_e_evaluacion.py`) con veredicto success/partial/fail, latencia y
+(`evaluacion/parte_e_evaluacion.py`) con veredicto success/partial/fail, latencia y
 tokens por test. Las herramientas con efectos secundarios se ejecutan en
 seco para poder repetir la evaluación sin enviar correos reales.
 
@@ -273,14 +273,14 @@ medida en la Parte B.
 
 ```powershell
 git clone <REPO_URL> && cd IRONMAN
-.\setup.ps1                              # venv + deps fijadas + modelos + índice RAG
-python parte_a_cuantizacion.py           # Parte A  -> measurements.csv
-python parte_b_kvcache.py                # Parte B (KV f16)
-.\run_kv_quant.ps1                       # Parte B.4 (KV q8_0)
-python graficas.py                       # gráficas
-python parte_c_rag.py compare            # Parte C
-python parte_e_evaluacion.py             # Parte E
-python jarvis.py                         # demo interactiva (texto)
+.\setup.ps1                                  # venv + deps + modelos + índice RAG
+python benchmarks\parte_a_cuantizacion.py    # Parte A  -> measurements.csv
+python benchmarks\parte_b_kvcache.py         # Parte B (KV f16)
+.\benchmarks\run_kv_quant.ps1                # Parte B.4 (KV q8_0)
+python benchmarks\graficas.py                # gráficas
+python rag\parte_c_rag.py compare            # Parte C
+python evaluacion\parte_e_evaluacion.py      # Parte E
+python asistente\jarvis.py                   # demo interactiva (texto)
 ```
 
 Versiones: Ollama 0.30.6, Python 3.13, paquetes fijados en `requirements.txt`
@@ -292,11 +292,11 @@ Versiones: Ollama 0.30.6, Python 3.13, paquetes fijados en `requirements.txt`
 [1] Ollama. "Ollama documentation." docs.ollama.com, 2026.
 [2] G. Gerganov et al. "llama.cpp: LLM inference in C/C++." github.com/ggml-org/llama.cpp, 2026.
 [3] Meta AI. "Llama 3.2: Revolutionizing edge AI and vision with open models." 2024.
-[4] Z. Nussbaum, J. X. Morris, B. Duderstadt, A. Mulyar. "Nomic Embed: Training a Reproducible Long Context Text Embedder." arXiv:2402.01613, 2024.
+[4] Z. Nussbaum et al. "Nomic Embed: Training a Reproducible Long Context Text Embedder." arXiv:2402.01613, 2024.
 [5] Anthropic. "Model Context Protocol." modelcontextprotocol.io, 2024.
 [6] A. Garcia, sqlite-vec: "A vector search SQLite extension." github.com/asg017/sqlite-vec, 2024.
 [7] T. Dettmers, L. Zettlemoyer. "The case for 4-bit precision: k-bit Inference Scaling Laws." ICML, 2023.
-[8] R. Pope et al. "Efficiently Scaling Transformer Inference." MLSys, 2023 (análisis del KV cache).
+[8] R. Pope et al. "Efficiently Scaling Transformer Inference." MLSys, 2023.
 
 # AI Use Statement
 

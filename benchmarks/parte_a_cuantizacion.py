@@ -78,7 +78,7 @@ SPEED_PROMPT = ("Explain in detail how a refrigerator works, covering the "
 SPEED_RUNS = 3      # se mide 3 veces y se promedia
 NUM_CTX = 2048      # contexto fijo en la Parte A (la Parte B lo varía)
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent   # raíz del proyecto (subimos desde benchmarks/)
 CSV_PATH = ROOT / "measurements.csv"
 RESULTS_DIR = ROOT / "resultados"
 

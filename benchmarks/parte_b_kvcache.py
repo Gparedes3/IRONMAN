@@ -30,7 +30,7 @@ from medir_comun import OLLAMA_HOST, stop_model, timed_generate
 MODEL = "llama3.2:3b-instruct-q4_K_M"   # el mejor equilibrio según la Parte A
 CONTEXTS = [512, 2048, 8192, 16384]     # las 4 longitudes de contexto a probar
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent   # raíz del proyecto (subimos desde benchmarks/)
 CSV_PATH = ROOT / "measurements.csv"
 CSV_FIELDS = ["model", "quantization", "context_length", "file_size_mb",
               "peak_ram_mb", "prompt_eval_tps", "eval_tps", "wall_s",

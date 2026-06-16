@@ -30,9 +30,10 @@ from pathlib import Path
 import ollama
 import sqlite_vec
 
-ROOT = Path(__file__).resolve().parent
-CORPUS = ROOT / "corpus"            # los documentos .md
-DB_PATH = ROOT / "index.db"         # la base de datos vectorial
+HERE = Path(__file__).resolve().parent   # carpeta rag/
+ROOT = HERE.parent                       # raíz del proyecto
+CORPUS = HERE / "corpus"            # los documentos .md (dentro de rag/)
+DB_PATH = HERE / "index.db"         # la base de datos vectorial (dentro de rag/)
 RESULTS_DIR = ROOT / "resultados"
 
 EMBED_MODEL = "nomic-embed-text"    # modelo de embeddings LOCAL (768 dimensiones)

@@ -12,7 +12,7 @@ desktop.ini
 Thumbs.db
 .DS_Store
 # Artefactos regenerables del RAG (se reconstruyen con setup.ps1)
-index.db
-corpus/
+rag/index.db
+rag/corpus/
 # Guía personal para grabar el vídeo (no es entregable)
 GUION_VIDEO.md

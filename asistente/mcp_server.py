@@ -22,6 +22,7 @@ import smtplib
 import email
 import os
 import subprocess
+import sys
 import urllib.parse
 import webbrowser
 from email.header import decode_header
@@ -31,8 +32,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
+# Raíz del proyecto (subimos desde asistente/) para poder importar rag.parte_c_rag
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
 # Carga las credenciales del archivo .env (correo, etc.). Nunca van en el código.
-load_dotenv()
+load_dotenv(ROOT / ".env")
 EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS", "").strip()
 EMAIL_APP_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "").strip()
 IMAP_HOST = os.environ.get("IMAP_HOST", "imap.gmail.com").strip()
@@ -145,7 +150,7 @@ def search_docs(query: str) -> str:
     """Busca en la base de conocimiento local (docs de Ollama y llama.cpp) y
     devuelve los fragmentos más relevantes. Úsala para preguntas técnicas sobre
     Ollama, llama.cpp, GGUF, cuantización o configuración."""
-    from parte_c_rag import retrieve  # import aquí para no cargar el RAG si no se usa
+    from rag.parte_c_rag import retrieve  # import aquí para no cargar el RAG si no se usa
     hits = retrieve(query, k=4)
     if not hits:
         return "No se encontró nada relevante en la base de conocimiento."

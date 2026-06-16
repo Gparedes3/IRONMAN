@@ -16,7 +16,7 @@ matplotlib.use("Agg")            # modo sin ventana (solo guarda archivos)
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent   # raíz del proyecto (subimos desde benchmarks/)
 OUT = ROOT / "report"
 OUT.mkdir(exist_ok=True)
 

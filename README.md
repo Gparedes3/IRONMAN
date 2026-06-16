@@ -8,26 +8,28 @@ la nube en el camino de inferencia.
 > Informe técnico: [`report/report.pdf`](report/report.pdf)
 > Vídeo de demo: [enlace pendiente](#demo)
 
-## Qué es cada archivo (estructura plana, un archivo por parte)
+## Estructura del proyecto (una carpeta por parte)
 
-| Archivo | Para qué sirve | Parte |
+| Carpeta / archivo | Para qué sirve | Parte |
 |---|---|---|
-| `jarvis.py` | El asistente: chat + herramientas + RAG (la demo) | D |
-| `mcp_server.py` | Servidor MCP con las 6 herramientas | D |
-| `parte_a_cuantizacion.py` | Mide tamaño, RAM, velocidad y calidad de 3 cuantizaciones | A |
-| `parte_b_kvcache.py` | Mide el KV cache con 4 longitudes de contexto | B |
-| `parte_c_rag.py` | Construye el índice, recupera y compara con/sin RAG | C |
-| `parte_e_evaluacion.py` | Corre el test de 21 preguntas | E |
-| `medir_comun.py` | Funciones de medición compartidas (A y B) | A, B |
-| `graficas.py` | Dibuja las 2 gráficas del informe | A, B |
-| `rubrica.md` | Cómo se puntúa la calidad (0–3) | A, C |
-| `test_set.json` | Las 21 preguntas de evaluación | E |
-| `measurements.csv` | Todos los números medidos | A, B |
-| `FAILURES.md` | Casos donde fallan las herramientas | D |
-| `corpus/` | Documentos para el RAG (~200 páginas) | C |
-| `index.db` | Índice vectorial del RAG | C |
-| `resultados/` | Salidas para puntuar (calidad, RAG, evaluación) | A, C, E |
+| `asistente/jarvis.py` | El asistente: chat + herramientas + RAG (la demo) | D |
+| `asistente/mcp_server.py` | Servidor MCP con las 6 herramientas | D |
+| `benchmarks/parte_a_cuantizacion.py` | Mide tamaño, RAM, velocidad y calidad de 3 cuantizaciones | A |
+| `benchmarks/parte_b_kvcache.py` | Mide el KV cache con 4 longitudes de contexto | B |
+| `benchmarks/medir_comun.py` | Funciones de medición compartidas (A y B) | A, B |
+| `benchmarks/graficas.py` | Dibuja las 2 gráficas del informe | A, B |
+| `benchmarks/run_kv_quant.ps1` | Mide el KV cache cuantizado a Q8 | B.4 |
+| `rag/parte_c_rag.py` | Construye el índice, recupera y compara con/sin RAG | C |
+| `rag/corpus/` | Documentos para el RAG (~200 páginas) | C |
+| `rag/index.db` | Índice vectorial del RAG | C |
+| `evaluacion/parte_e_evaluacion.py` | Corre el test de 21 preguntas | E |
+| `evaluacion/test_set.json` | Las 21 preguntas de evaluación | E |
 | `report/` | Informe, gráficas y PDF | — |
+| `resultados/` | Salidas para puntuar (calidad, RAG, evaluación) | A, C, E |
+| `docs/` | Diagramas de arquitectura | — |
+| `measurements.csv` | Todos los números medidos | A, B |
+| `rubrica.md` | Cómo se puntúa la calidad (0–3) | A, C |
+| `FAILURES.md` | Casos donde fallan las herramientas | D |
 
 ## Requisitos
 
@@ -47,14 +49,14 @@ Para el correo (opcional): copia `.env.example` a `.env` y pon una
 ```powershell
 .\.venv\Scripts\Activate.ps1            # activar el entorno
 
-python parte_a_cuantizacion.py          # Parte A  -> measurements.csv + resultados/
-python parte_b_kvcache.py               # Parte B (KV f16)
-.\run_kv_quant.ps1                      # Parte B.4 (KV q8_0)
-python graficas.py                      # gráficas -> report/
-python parte_c_rag.py compare           # Parte C  -> resultados/compare_results.json
-python parte_e_evaluacion.py            # Parte E  -> resultados/results.json
+python benchmarks\parte_a_cuantizacion.py   # Parte A  -> measurements.csv + resultados/
+python benchmarks\parte_b_kvcache.py        # Parte B (KV f16)
+.\benchmarks\run_kv_quant.ps1               # Parte B.4 (KV q8_0)
+python benchmarks\graficas.py               # gráficas -> report/
+python rag\parte_c_rag.py compare           # Parte C  -> resultados/compare_results.json
+python evaluacion\parte_e_evaluacion.py     # Parte E  -> resultados/results.json
 
-python jarvis.py                        # la demo interactiva
+python asistente\jarvis.py                  # la demo interactiva
 ```
 
 Tras la Parte A y la C hay que **puntuar a mano** las respuestas (0–3) con

@@ -26,13 +26,13 @@ from dotenv import load_dotenv
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-# --- Configuración (desde .env, con valores por defecto) ---
-load_dotenv()
+# --- Configuración (desde .env en la raíz del proyecto, con valores por defecto) ---
+ROOT = Path(__file__).resolve().parent          # carpeta asistente/
+load_dotenv(ROOT.parent / ".env")               # .env está en la raíz del proyecto
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2:3b-instruct-q4_K_M").strip()
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434").strip()
 
-ROOT = Path(__file__).resolve().parent
-# Cómo arrancar el servidor MCP: "python mcp_server.py"
+# El servidor MCP (mcp_server.py) está en esta misma carpeta (asistente/)
 SERVER_PARAMS = StdioServerParameters(command=sys.executable,
                                       args=[str(ROOT / "mcp_server.py")])
 
