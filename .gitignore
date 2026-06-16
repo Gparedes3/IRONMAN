@@ -5,7 +5,8 @@ __pycache__/
 *.log
 models/
 # Configuración local de Claude Code / editores
-.claude/settings.local.json
+.claude/
+.vscode/
 # Archivos basura del SO (OneDrive crea desktop.ini)
 desktop.ini
 Thumbs.db
@@ -13,3 +14,5 @@ Thumbs.db
 # Artefactos regenerables del RAG (se reconstruyen con setup.ps1)
 index.db
 corpus/
+# Guía personal para grabar el vídeo (no es entregable)
+GUION_VIDEO.md
